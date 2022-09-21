@@ -3,6 +3,7 @@ package frc.robot;
 // Credit: Team 1323
 
 import frc.robot.loops.*;
+import frc.robot.logger.*;
 import frc.robot.subsystems.Subsystem;
 
 import java.util.*;
@@ -84,6 +85,10 @@ public class SubsystemManager implements ILooper {
 
     public void registerDisabledLoops(Looper disabledLooper) {
         disabledLooper.register(new DisabledLoop());
+    }
+
+    public void registerLoggingSystems(LoggingSystem LS) {
+        mAllSubsystems.forEach(s -> s.registerLogger(LS));
     }
 
     @Override

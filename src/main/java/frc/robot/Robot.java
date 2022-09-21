@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.loops.Looper;
 import frc.robot.subsystems.Swerve;
 import frc.robot.controls.Controller;
+import frc.robot.logger.*;
 
 import frc.robot.controls.Controller.SwerveCardinal;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,12 +32,17 @@ public class Robot extends TimedRobot {
   private final Looper mEnabledLooper = new Looper();
   private final Looper mDisabledLooper = new Looper();
 
+  // Instantiate logging looper
+  private final Looper mLoggingLooper = new Looper();
+
   // Subsystem instances
 
   private final Controller mController = Controller.getInstance();
 
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
   private final Swerve mSwerve = Swerve.getInstance();
+
+  private LoggingSystem mLogger = LoggingSystem.getInstance();
 
   @Override
   public void robotInit() {
@@ -49,6 +55,9 @@ public class Robot extends TimedRobot {
 
       mSubsystemManager.registerEnabledLoops(mEnabledLooper);
       mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+
+      mSubsystemManager.registerLoggingSystems(mLogger);
+      mLogger.registerLoops(mLoggingLooper);
 
     } catch (Throwable t) {
       throw t;
@@ -70,6 +79,7 @@ public class Robot extends TimedRobot {
 
       mDisabledLooper.stop();
 			mEnabledLooper.start();
+      mLoggingLooper.start();
 
     } catch (Throwable t) {
 
@@ -90,6 +100,7 @@ public class Robot extends TimedRobot {
     try {
       mDisabledLooper.stop();
 			mEnabledLooper.start();
+      mLoggingLooper.start();
     } catch (Throwable t) {
       throw t;
     }
@@ -120,43 +131,31 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    
     try {
-
       mEnabledLooper.stop();
 			mDisabledLooper.start();
-
+      mLoggingLooper.stop();
     } catch (Throwable t) {
-
       throw t;
-
     }
-
   }
 
   @Override
   public void disabledPeriodic() {
-    
     try {
-
       mDisabledLooper.outputToSmartDashboard();
-
     } catch (Throwable t) {
-
       throw t;
-
     }
 
   }
 
   @Override
   public void testInit() {
-
     try {
-
       mEnabledLooper.stop();
 			mDisabledLooper.stop();
-
+      mLoggingLooper.stop();
     } catch (Throwable t) {
 
       throw t;

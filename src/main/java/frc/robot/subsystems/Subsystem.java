@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 // Credit: Team 1678
 
 import frc.robot.loops.ILooper;
+import frc.robot.logger.*;
 
 /**
  * The Subsystem abstract class, which serves as a basic framework for all robot subsystems. Each subsystem outputs
@@ -28,6 +29,8 @@ public abstract class Subsystem {
     public void zeroSensors() {}
 
     public void registerEnabledLoops(ILooper enabledLooper) {}
+
+    public void registerLogger(LoggingSystem LS) {}
 
     public abstract boolean checkSystem();
 

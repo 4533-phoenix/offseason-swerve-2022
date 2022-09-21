@@ -4,6 +4,7 @@ package frc.robot.subsystems;
 
 import frc.robot.Constants;
 import frc.robot.loops.*;
+import frc.robot.logger.*;
 
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
@@ -23,9 +24,15 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 
+import java.util.*;
+
 public class Swerve extends Subsystem {
 
     private static Swerve mInstance;
+
+    public PeriodicIO mPeriodicIO = new PeriodicIO();
+
+    LogStorage<PeriodicIO> mStorage = null;
 
     public boolean isEnabled = false;
     public boolean isSnapping;
@@ -241,5 +248,62 @@ public class Swerve extends Subsystem {
       @Override
       public boolean checkSystem() {
           return true;
+      }
+
+      @Override
+      public void readPeriodicInputs() {
+          mPeriodicIO.gyro_heading = new Rotation2d(navX.getYaw()).getDegrees();
+          mPeriodicIO.robot_pitch = new Rotation2d(navX.getPitch()).getDegrees();
+          mPeriodicIO.robot_roll = new Rotation2d(navX.getRoll()).getDegrees();
+          mPeriodicIO.snap_target = Math.toDegrees(snapPIDController.getGoal().position);
+          mPeriodicIO.swerve_heading = MathUtil.inputModulus(new Rotation2d(navX.getYaw()).getDegrees(), 0, 360);
+  
+          SendLog();
+      }
+  
+      public static class PeriodicIO {
+          // inputs
+          public double gyro_heading;
+          public double robot_pitch;
+          public double robot_roll;
+          public double swerve_heading;
+  
+          public double angular_velocity;
+          public double goal_velocity;
+  
+          // outputs
+          public double snap_target;
+      }
+  
+      //logger
+      @Override
+      public void registerLogger(LoggingSystem LS) {
+          SetupLog();
+          LS.register(mStorage, "SWERVE_LOGS.csv");
+      }
+      
+      public void SetupLog() {
+          mStorage = new LogStorage<PeriodicIO>();
+  
+          ArrayList<String> headers = new ArrayList<String>();
+          headers.add("timestamp");
+          headers.add("is_enabled");
+          headers.add("gyro_heading");
+          headers.add("robot_pitch");
+          headers.add("robot_roll");
+          headers.add("snap_target");
+          headers.add("swerve_heading");
+  
+          mStorage.setHeaders(headers);
+      }
+  
+      public void SendLog() {
+          ArrayList<Number> items = new ArrayList<Number>();
+          items.add(isEnabled ? 1.0 : 0.0);
+          items.add(mPeriodicIO.gyro_heading);
+          items.add(mPeriodicIO.robot_pitch);
+          items.add(mPeriodicIO.robot_roll);
+          items.add(mPeriodicIO.snap_target);
+          items.add(mPeriodicIO.swerve_heading);
       }
 }
