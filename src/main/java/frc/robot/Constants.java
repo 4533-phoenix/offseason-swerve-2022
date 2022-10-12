@@ -20,13 +20,9 @@ public final class Constants {
 
 	// Drive encoder IDs
 
-	public static final int DRIVE_RF_ENCODER = 1;
 	public static final int STEER_RF_ENCODER = 2;
-	public static final int DRIVE_LF_ENCODER = 3;
 	public static final int STEER_LF_ENCODER = 4;
-    public static final int DRIVE_RB_ENCODER = 5;
 	public static final int STEER_RB_ENCODER = 6;
-    public static final int DRIVE_LB_ENCODER = 7;
 	public static final int STEER_LB_ENCODER = 8;
 
 	// Drive controller IDs
@@ -81,7 +77,7 @@ public final class Constants {
 
 	public static final double MAX_DRIVE_SPEED_METERS_PER_SECOND = 4.5;
 
-	// Snap PID constants - currently using 1678's values
+	// Snap PID constants - to be measured
 	public static final double SNAP_KP = 0.0;
 	public static final double SNAP_KI = 0.0;
 	public static final double SNAP_KD = 0.0;
