@@ -195,6 +195,11 @@ public class Swerve extends Subsystem {
             );
         }
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.MAX_DRIVE_SPEED_METERS_PER_SECOND);
+
+        for (int mod = 0; mod < swerveMods.length; mod++) {
+            swerveMods[mod].set(swerveModuleStates[mod].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, 
+                    swerveModuleStates[mod].angle.getRadians());
+        }
     }
 
     public double calculateSnapValue() {
