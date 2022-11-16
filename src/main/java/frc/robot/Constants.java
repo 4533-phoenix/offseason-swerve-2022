@@ -9,21 +9,21 @@ public final class Constants {
 
     // Drive motor IDs
 
-    public static final int DRIVE_RF = 1;
-	public static final int STEER_RF = 2;
-	public static final int DRIVE_LF = 3;
-	public static final int STEER_LF = 4;
-    public static final int DRIVE_RB = 5;
-	public static final int STEER_RB = 6;
-    public static final int DRIVE_LB = 7;
-	public static final int STEER_LB = 8;
+    public static final int DRIVE_RF = 2;
+	public static final int STEER_RF = 3;
+	public static final int DRIVE_LF = 8;
+	public static final int STEER_LF = 1;
+    public static final int DRIVE_RB = 6;
+	public static final int STEER_RB = 7;
+    public static final int DRIVE_LB = 4;
+	public static final int STEER_LB = 5;
 
 	// Drive encoder IDs
 
-	public static final int STEER_RF_ENCODER = 2;
-	public static final int STEER_LF_ENCODER = 4;
-	public static final int STEER_RB_ENCODER = 6;
-	public static final int STEER_LB_ENCODER = 8;
+	public static final int STEER_RF_ENCODER = 1;
+	public static final int STEER_LF_ENCODER = 0;
+	public static final int STEER_RB_ENCODER = 3;
+	public static final int STEER_LB_ENCODER = 2;
 
 	// Drive controller IDs
 
@@ -62,16 +62,16 @@ public final class Constants {
 	public static final double SWERVE_DEADBAND = 0.15;
 
 	// Left-to-right distance between drivetrain wheels (center-to-center)
-	public static final double DRIVETRAIN_TRACKWIDTH_METERS = 1.0;
+	public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.5715;
 
 	// Front-to-back distance between drivetrain wheels (center-to-center)
-	public static final double DRIVETRAIN_WHEELBASE_METERS = 1.0;
+	public static final double DRIVETRAIN_WHEELBASE_METERS = 0.5715;
 
 	// Offsets for each steer motor in radians (ideally straight forward should be set to zero)
-	public static final double RF_STEER_OFFSET = 0.0;
-	public static final double LF_STEER_OFFSET = 0.0;
-	public static final double RB_STEER_OFFSET = 0.0;
-	public static final double LB_STEER_OFFSET = 0.0;
+	public static final double RF_STEER_OFFSET = 5.7422;
+	public static final double LF_STEER_OFFSET = 4.5332;
+	public static final double RB_STEER_OFFSET = 5.4590;
+	public static final double LB_STEER_OFFSET = 3.0749;
 
 	public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2.0 * Math.PI;
 

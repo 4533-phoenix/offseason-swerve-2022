@@ -7,7 +7,7 @@ public class PSController {
     private final XboxController mController;
 
     public enum Side {
-        LEFT, RIGHT
+        RIGHT, LEFT
     }
 
     public enum Axis {

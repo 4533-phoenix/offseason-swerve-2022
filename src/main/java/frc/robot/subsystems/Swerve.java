@@ -6,9 +6,9 @@ import frc.robot.Constants;
 import frc.robot.loops.*;
 import frc.robot.logger.*;
 
-import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
-import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
-import com.swervedrivespecialties.swervelib.SwerveModule;
+import frc.robot.sdsLib.Mk4SwerveModuleHelper;
+import frc.robot.sdsLib.SdsModuleConfigurations;
+import frc.robot.sdsLib.SwerveModule;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -38,7 +38,7 @@ public class Swerve extends Subsystem {
     public boolean isSnapping;
 
     // Max voltage that can be delivered to the drive motors. Use to cap max speed.
-    public static final double MAX_VOLTAGE = 12.0;
+    public static final double MAX_VOLTAGE = 11.0;
 
     // Theoretical max robot velocity for moving in a straight line.
     // Formula: <Motor free speed RPM> / 60 * <Drive reduction> * <Wheel diameter meters> * pi
@@ -175,10 +175,10 @@ public class Swerve extends Subsystem {
         SwerveModuleState[] swerveModuleStates = null;
         if (mLocked) {
             swerveModuleStates = new SwerveModuleState[]{
-                new SwerveModuleState(0.1, Rotation2d.fromDegrees(45)),
-                new SwerveModuleState(0.1, Rotation2d.fromDegrees(315)),
-                new SwerveModuleState(0.1, Rotation2d.fromDegrees(135)),
-                new SwerveModuleState(0.1, Rotation2d.fromDegrees(225))
+                new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+                new SwerveModuleState(0, Rotation2d.fromDegrees(315)),
+                new SwerveModuleState(0, Rotation2d.fromDegrees(135)),
+                new SwerveModuleState(0, Rotation2d.fromDegrees(225))
             };
         } else {
             swerveModuleStates = kinematics.toSwerveModuleStates(

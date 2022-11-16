@@ -67,14 +67,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+    System.out.println("Left front: " + mSwerve.frontLeftModule.getSteerAngle());
+    System.out.println("Right front: " + mSwerve.frontRightModule.getSteerAngle());
+    System.out.println("Left back: " + mSwerve.backLeftModule.getSteerAngle());
+    System.out.println("Right back: " + mSwerve.backRightModule.getSteerAngle());
 
     mEnabledLooper.outputToSmartDashboard();
-    
   }
 
   @Override
   public void autonomousInit() {
-    
+
     try {
 
       mDisabledLooper.stop();
@@ -119,9 +122,9 @@ public class Robot extends TimedRobot {
       mSwerve.zeroGyroscope();
     }
 
-    if (mController.getSwerveSnap() != SwerveCardinal.NONE) {
-      mSwerve.startSnap(mController.getSwerveSnap().degrees);
-    }
+    // if (mController.getSwerveSnap() != SwerveCardinal.NONE) {
+    //   mSwerve.startSnap(mController.getSwerveSnap().degrees);
+    // }
     Translation2d swerveTranslation = new Translation2d(mController.getSwerveTranslation().getX(),
         mController.getSwerveTranslation().getY());
     double swerveRotation = mController.getSwerveRotation();
