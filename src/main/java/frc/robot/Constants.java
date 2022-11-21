@@ -68,10 +68,10 @@ public final class Constants {
 	public static final double DRIVETRAIN_WHEELBASE_METERS = 0.5715;
 
 	// Offsets for each steer motor in radians (ideally straight forward should be set to zero)
-	public static final double RF_STEER_OFFSET = 5.7422;
-	public static final double LF_STEER_OFFSET = 4.5332;
-	public static final double RB_STEER_OFFSET = 5.4590;
-	public static final double LB_STEER_OFFSET = 3.0749;
+	public static final double RF_STEER_OFFSET = 0.0974;
+	public static final double LF_STEER_OFFSET = 0.3525;
+	public static final double RB_STEER_OFFSET = 1.0;
+	public static final double LB_STEER_OFFSET = 0.7535;
 
 	public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2.0 * Math.PI;
 

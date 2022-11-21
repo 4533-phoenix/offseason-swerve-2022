@@ -28,10 +28,10 @@ public class Controller {
         RIGHT(90),
         BACKWARDS(180),
 
-        FAR_FENDER(143),
-        RIGHT_FENDER(233),
-        LEFT_FENDER(53),
-        CLOSE_FENDER(323);
+        FAR_FENDER(0),
+        RIGHT_FENDER(0),
+        LEFT_FENDER(0),
+        CLOSE_FENDER(0);
 
         public final double degrees;
 

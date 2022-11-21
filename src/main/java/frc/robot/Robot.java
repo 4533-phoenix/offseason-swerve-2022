@@ -123,7 +123,7 @@ public class Robot extends TimedRobot {
     }
 
     // if (mController.getSwerveSnap() != SwerveCardinal.NONE) {
-    //   mSwerve.startSnap(mController.getSwerveSnap().degrees);
+    mSwerve.startSnap(mController.getSwerveSnap().degrees);
     // }
     Translation2d swerveTranslation = new Translation2d(mController.getSwerveTranslation().getX(),
         mController.getSwerveTranslation().getY());
