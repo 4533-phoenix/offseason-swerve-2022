@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import frc.robot.Constants;
+import frc.robot.Constants.*;
 import frc.robot.loops.*;
 import frc.robot.logger.*;
 
@@ -9,7 +9,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 
 public class Auto extends Subsystem {
-
     private static Auto mInstance;
 
     public PeriodicIO mPeriodicIO = new PeriodicIO();
@@ -19,11 +18,23 @@ public class Auto extends Subsystem {
     public boolean isEnabled = false;
 
     HolonomicDriveController autoController = new HolonomicDriveController(
-        new PIDController(1,0,0), // x
-        new PIDController(1,0,0), // y
-        new ProfiledPIDController(1,0,0, // rotation
-            new TrapezoidProfile.Constraints(6.28,3.14)) // currently max omega = 1 rot/s and max alpha = 180 deg/s^2
-        );
+        new PIDController(
+            AutoConstants.AUTO_X_KP,
+            AutoConstants.AUTO_X_KI,
+            AutoConstants.AUTO_X_KD
+        ),
+        new PIDController(
+            AutoConstants.AUTO_Y_KP,
+            AutoConstants.AUTO_Y_KI,
+            AutoConstants.AUTO_Y_KD
+        ),
+        new ProfiledPIDController(
+            AutoConstants.AUTO_THETA_KP,
+            AutoConstants.AUTO_THETA_KI,
+            AutoConstants.AUTO_THETA_KD,
+            AutoConstants.AUTO_THETA_CONSTRAINTS
+        )
+    );
 
     public static Auto getInstance() {
         if (mInstance == null) {
@@ -42,7 +53,7 @@ public class Auto extends Subsystem {
         return true;
     }
 
-      public static class PeriodicIO {
+    public static class PeriodicIO {
 
     }
 }

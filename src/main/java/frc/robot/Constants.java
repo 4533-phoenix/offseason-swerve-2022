@@ -12,6 +12,25 @@ public final class Constants {
 		public static final double LOOPER_TIME = 0.02;
 	}
 
+    public static final class AutoConstants {
+        // Holonomic controller PID constants - x
+        public static final double AUTO_X_KP = 1.0;
+        public static final double AUTO_X_KI = 0.0;
+        public static final double AUTO_X_KD = 0.0;
+
+        // Holonomic controller PID constants - y
+        public static final double AUTO_Y_KP = 1.0;
+        public static final double AUTO_Y_KI = 0.0;
+        public static final double AUTO_Y_KD = 0.0;
+
+        // Holonomic controller PID constants - theta
+        public static final double AUTO_THETA_KP = 1.0;
+        public static final double AUTO_THETA_KI = 0.0;
+        public static final double AUTO_THETA_KD = 0.0;
+        // Max angular velocity, acceleration in rad/s
+        public static final TrapezoidProfile.Constraints AUTO_THETA_CONSTRAINTS = new TrapezoidProfile.Constraints(6.28,3.14);
+    }
+
 	public static final class ModuleConstants {
         public static final double WHEEL_DIAMETER_INCHES = 4;
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES);
