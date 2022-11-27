@@ -1,7 +1,7 @@
 package frc.robot.controls;
 
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.Constants;
+import frc.robot.Constants.*;
 
 public class PSController {
     private final XboxController mController;
@@ -36,7 +36,7 @@ public class PSController {
     }
 
     public boolean getTrigger(Side side) {
-        return mController.getRawAxis(side == Side.LEFT ? 2 : 3) > Constants.TRIGGER_THRESHOLD;
+        return mController.getRawAxis(side == Side.LEFT ? 2 : 3) > OIConstants.TRIGGER_THRESHOLD;
     }
 
     public boolean getButton(Button button) {

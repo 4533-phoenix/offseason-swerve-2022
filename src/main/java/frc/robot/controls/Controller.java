@@ -1,6 +1,6 @@
 package frc.robot.controls;
 
-import frc.robot.Constants;
+import frc.robot.Constants.*;
 import frc.robot.controls.PSController.Axis;
 import frc.robot.controls.PSController.Button;
 import frc.robot.controls.PSController.Side;
@@ -8,10 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class Controller {
-    private final double swerveDeadband = Constants.SWERVE_DEADBAND;
-
-    private int mLastDpadLeft = -1;
-    private int mLastDpadRight = -1;
+    private final double swerveDeadband = OIConstants.DRIVE_DEADBAND;
 
     private final int kDpadUp = 0;
     private final int kDpadRight = 90;
@@ -28,10 +25,10 @@ public class Controller {
         RIGHT(90),
         BACKWARDS(180),
 
-        FAR_FENDER(143),
-        RIGHT_FENDER(233),
-        LEFT_FENDER(53),
-        CLOSE_FENDER(323);
+        FAR_FENDER(135),
+        RIGHT_FENDER(225),
+        LEFT_FENDER(45),
+        CLOSE_FENDER(315);
 
         public final double degrees;
 
@@ -49,11 +46,9 @@ public class Controller {
     }
 
     public final PSController driver;
-    public final PSController operator;
 
     private Controller() {
-        driver = new PSController(Constants.DRIVER_CONTROLLER);
-        operator = new PSController(Constants.OPERATOR_CONTROLLER);
+        driver = new PSController(OIConstants.DRIVER_CONTROLLER_PORT);
     }
 
     // DRIVER CONTROLS
@@ -61,31 +56,22 @@ public class Controller {
         double forwardAxis = driver.getAxis(Side.LEFT, Axis.Y);
         double strafeAxis = driver.getAxis(Side.LEFT, Axis.X);
 
-        forwardAxis = Constants.INVERT_Y_AXIS ? forwardAxis : -forwardAxis;
-        strafeAxis = Constants.INVERT_X_AXIS ? strafeAxis :-strafeAxis;
-
         Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
         if (Math.abs(tAxes.getNorm()) < swerveDeadband) {
             return new Translation2d();
         } else {
-            Rotation2d deadbandDirection = new Rotation2d(tAxes.getX(), tAxes.getY());
-            Translation2d deadbandVector = new Translation2d(swerveDeadband, deadbandDirection);
-
-            double scaled_x = tAxes.getX() - (deadbandVector.getX()) / (1 - deadbandVector.getX());
-            double scaled_y = tAxes.getY() - (deadbandVector.getY()) / (1 - deadbandVector.getY());
-            return new Translation2d(scaled_x, scaled_y).times(Constants.MAX_DRIVE_SPEED_METERS_PER_SECOND);
+            return tAxes;
         }
     }
 
     public double getSwerveRotation() {
         double rotAxis = driver.getAxis(Side.RIGHT, Axis.X);
-        rotAxis = Constants.INVERT_ANGULAR_AXIS ? rotAxis : -rotAxis;
 
         if (Math.abs(rotAxis) < swerveDeadband) {
             return 0.0;
         } else {
-            return Constants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * (rotAxis - (Math.signum(rotAxis) * swerveDeadband)) / (1 - swerveDeadband);
+            return rotAxis;
         }
     }
 

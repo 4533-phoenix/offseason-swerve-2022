@@ -67,24 +67,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-
     mEnabledLooper.outputToSmartDashboard();
-    
+    mSwerve.printModuleOffsets();
   }
 
   @Override
   public void autonomousInit() {
-    
-    try {
 
+    try {
       mDisabledLooper.stop();
 			mEnabledLooper.start();
       mLoggingLooper.start();
-
     } catch (Throwable t) {
-
       throw t;
-
     }
 
   }
@@ -109,24 +104,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    if (mController.getBrake()) {
-      mSwerve.setLocked(true);
-    } else {
-      mSwerve.setLocked(false);
-    }
 
     if (mController.zeroGyro()) {
-      mSwerve.zeroGyroscope();
+      mSwerve.zeroHeading();
     }
 
-    if (mController.getSwerveSnap() != SwerveCardinal.NONE) {
-      mSwerve.startSnap(mController.getSwerveSnap().degrees);
-    }
     Translation2d swerveTranslation = new Translation2d(mController.getSwerveTranslation().getX(),
         mController.getSwerveTranslation().getY());
     double swerveRotation = mController.getSwerveRotation();
 
     mSwerve.drive(swerveTranslation, swerveRotation, true, true);
+    
   }
 
   @Override

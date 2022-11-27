@@ -8,9 +8,10 @@ import frc.robot.Constants;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.GlobalConstants;
 
 public class Looper implements ILooper {
-    public final double kPeriod = Constants.kLooperDt;
+    public final double kPeriod = GlobalConstants.LOOPER_TIME;
 
     private boolean running_;
 
