@@ -10,32 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class Controller {
     private final double swerveDeadband = OIConstants.DRIVE_DEADBAND;
 
-    private final int kDpadUp = 0;
-    private final int kDpadRight = 90;
-    private final int kDpadDown = 180;
-    private final int kDpadLeft = 270;
-
     private static Controller mInstance = null;
-
-    public enum SwerveCardinal {
-        NONE(0),
-
-        FORWARDS(0),
-        LEFT(270),
-        RIGHT(90),
-        BACKWARDS(180),
-
-        FAR_FENDER(135),
-        RIGHT_FENDER(225),
-        LEFT_FENDER(45),
-        CLOSE_FENDER(315);
-
-        public final double degrees;
-
-        SwerveCardinal(double degrees) {
-            this.degrees = degrees;
-        }
-    }
 
     public static Controller getInstance() {
         if (mInstance == null) {
@@ -52,6 +27,7 @@ public class Controller {
     }
 
     // DRIVER CONTROLS
+    
     public Translation2d getSwerveTranslation() {
         double forwardAxis = driver.getAxis(Side.LEFT, Axis.Y);
         double strafeAxis = driver.getAxis(Side.LEFT, Axis.X);
@@ -78,42 +54,4 @@ public class Controller {
     public boolean zeroGyro() {
         return driver.getButton(Button.START) && driver.getButton(Button.BACK);
     }
-
-    public SwerveCardinal getSwerveSnap() {
-
-        // FENDER SNAPS
-        if (driver.getButton(Button.A)) {
-            return SwerveCardinal.CLOSE_FENDER;
-        }
-        if (driver.getButton(Button.B)) {
-            return SwerveCardinal.LEFT_FENDER;
-        }
-        if (driver.getButton(Button.X)) {
-            return SwerveCardinal.RIGHT_FENDER;
-        }
-        if (driver.getButton(Button.Y)) {
-            return SwerveCardinal.FAR_FENDER;
-        }
-
-        // CARDINAL SNAPS
-
-        switch (driver.getController().getPOV()) {
-            case kDpadUp:
-                return SwerveCardinal.FORWARDS;
-            case kDpadLeft:
-                return SwerveCardinal.RIGHT;
-            case kDpadRight:
-                return SwerveCardinal.LEFT;
-            case kDpadDown:
-                return SwerveCardinal.BACKWARDS;
-            default:
-                return SwerveCardinal.NONE;
-        }
-            
-    }
-
-    public boolean getBrake() {
-        return driver.getButton(Button.LB);
-    }
-
 }

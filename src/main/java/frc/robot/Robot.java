@@ -5,16 +5,12 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.loops.Looper;
 import frc.robot.subsystems.Swerve;
 import frc.robot.controls.Controller;
 import frc.robot.logger.*;
 
-import frc.robot.controls.Controller.SwerveCardinal;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 import java.util.*;
@@ -28,17 +24,16 @@ import java.util.*;
 public class Robot extends TimedRobot {
 
   // Instantiate enabled and disabled loopers
-
   private final Looper mEnabledLooper = new Looper();
   private final Looper mDisabledLooper = new Looper();
 
   // Instantiate logging looper
   private final Looper mLoggingLooper = new Looper();
 
-  // Subsystem instances
-
+  // Controller instance
   private final Controller mController = Controller.getInstance();
 
+  // Subsystem instances
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
   private final Swerve mSwerve = Swerve.getInstance();
 
@@ -46,9 +41,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    
     try {
-
       mSubsystemManager.setSubsystems(
         mSwerve
       );
@@ -58,11 +51,9 @@ public class Robot extends TimedRobot {
 
       mSubsystemManager.registerLoggingSystems(mLogger);
       mLogger.registerLoops(mLoggingLooper);
-
     } catch (Throwable t) {
       throw t;
     }
-
   }
 
   @Override
@@ -73,7 +64,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-
     try {
       mDisabledLooper.stop();
 			mEnabledLooper.start();
@@ -81,7 +71,6 @@ public class Robot extends TimedRobot {
     } catch (Throwable t) {
       throw t;
     }
-
   }
 
   @Override
@@ -91,7 +80,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-
     try {
       mDisabledLooper.stop();
 			mEnabledLooper.start();
@@ -99,22 +87,18 @@ public class Robot extends TimedRobot {
     } catch (Throwable t) {
       throw t;
     }
-
   }
 
   @Override
   public void teleopPeriodic() {
-
-    if (mController.zeroGyro()) {
+    if (mController.zeroGyro())
       mSwerve.zeroHeading();
-    }
 
     Translation2d swerveTranslation = new Translation2d(mController.getSwerveTranslation().getX(),
         mController.getSwerveTranslation().getY());
     double swerveRotation = mController.getSwerveRotation();
 
     mSwerve.drive(swerveTranslation, swerveRotation, true, true);
-    
   }
 
   @Override
@@ -135,7 +119,6 @@ public class Robot extends TimedRobot {
     } catch (Throwable t) {
       throw t;
     }
-
   }
 
   @Override
@@ -145,11 +128,8 @@ public class Robot extends TimedRobot {
 			mDisabledLooper.stop();
       mLoggingLooper.stop();
     } catch (Throwable t) {
-
       throw t;
-
     }
-
   }
 
   @Override
