@@ -52,6 +52,6 @@ public class Controller {
     }
 
     public boolean zeroGyro() {
-        return driver.getButton(Button.START) && driver.getButton(Button.BACK);
+        return driver.getButton(Button.START);
     }
 }

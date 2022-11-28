@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-// Credit: Swerve Drive Specialties, Team 1678
-
 import frc.robot.Constants.*;
 import frc.robot.loops.*;
 import frc.robot.logger.*;
@@ -26,7 +24,6 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import java.util.*;
 
 public class Swerve extends Subsystem {
-    
     private static Swerve mInstance;
 
     public PeriodicIO mPeriodicIO = new PeriodicIO();
@@ -108,7 +105,7 @@ public class Swerve extends Subsystem {
     }
 
     public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getHeading());
+        return Rotation2d.fromDegrees(360.0 - getHeading());
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {

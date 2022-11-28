@@ -78,10 +78,6 @@ public class SwerveModule {
         return angle * (absoluteEncoderReversed ? -1.0 : 1.0);
     }
 
-    public double getRawAbsolutePosition() {
-        return absoluteEncoder.getPosition();
-    }
-
     public void resetEncoders() {
         driveEncoder.setPosition(0);
         steerEncoder.setPosition(getAbsoluteEncoderRad());
