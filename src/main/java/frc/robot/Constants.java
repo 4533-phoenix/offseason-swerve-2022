@@ -95,8 +95,8 @@ public final class Constants {
         public static final double BACK_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 6.1605;
         public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 2.9207;
 
-        public static final double DRIVE_MAX_SPEED_METERS_PER_SECOND = 3.0;
-        public static final double STEER_MAX_SPEED_RADIANS_PER_SECOND = 2.0 * 2.0 * Math.PI;
+        public static final double DRIVE_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(1.0);
+        public static final double STEER_MAX_SPEED_RADIANS_PER_SECOND = 3.5 * 2.0 * Math.PI;
 
         public static final double TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND = 5.0;
         public static final double TELEOP_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND = 3.0;

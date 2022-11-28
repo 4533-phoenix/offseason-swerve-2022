@@ -29,8 +29,8 @@ public class Controller {
     // DRIVER CONTROLS
     
     public Translation2d getSwerveTranslation() {
-        double forwardAxis = driver.getAxis(Side.LEFT, Axis.Y);
-        double strafeAxis = driver.getAxis(Side.LEFT, Axis.X);
+        double forwardAxis = (driver.getAxis(Side.LEFT, Axis.Y) / Math.abs(driver.getAxis(Side.LEFT, Axis.Y)) * Math.pow(driver.getAxis(Side.LEFT, Axis.Y),2));
+        double strafeAxis = (driver.getAxis(Side.LEFT, Axis.X) / Math.abs(driver.getAxis(Side.LEFT, Axis.X)) * Math.pow(driver.getAxis(Side.LEFT, Axis.X),2));
 
         Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
@@ -42,7 +42,7 @@ public class Controller {
     }
 
     public double getSwerveRotation() {
-        double rotAxis = driver.getAxis(Side.RIGHT, Axis.X);
+        double rotAxis = (driver.getAxis(Side.RIGHT, Axis.X) / Math.abs(driver.getAxis(Side.RIGHT, Axis.X)) * Math.pow(driver.getAxis(Side.RIGHT, Axis.X),2));
 
         if (Math.abs(rotAxis) < swerveDeadband) {
             return 0.0;
