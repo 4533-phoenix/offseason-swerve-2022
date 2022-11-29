@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import frc.robot.Constants.*;
 import frc.robot.loops.*;
-import frc.robot.logger.*;
 
 import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -10,10 +9,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public class Auto extends Subsystem {
     private static Auto mInstance;
-
-    public PeriodicIO mPeriodicIO = new PeriodicIO();
-
-    LogStorage<PeriodicIO> mStorage = null;
 
     public boolean isEnabled = false;
 
@@ -51,9 +46,5 @@ public class Auto extends Subsystem {
     @Override
     public boolean checkSystem() {
         return true;
-    }
-
-    public static class PeriodicIO {
-
     }
 }

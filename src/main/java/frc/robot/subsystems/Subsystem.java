@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 // Credit: Team 1678
 
 import frc.robot.loops.ILooper;
-import frc.robot.logger.*;
 
 /**
  * The Subsystem abstract class, which serves as a basic framework for all robot subsystems. Each subsystem outputs
@@ -16,21 +15,13 @@ import frc.robot.logger.*;
  * instantializing all member components at the start of the match.
  */
 public abstract class Subsystem {
-    public void writeToLog() {}
-
-    // Optional design pattern for caching periodic reads to avoid hammering the HAL/CAN.
-    public void readPeriodicInputs() {}
-
-    // Optional design pattern for caching periodic writes to avoid hammering the HAL/CAN.
-    public void writePeriodicOutputs() {}
+    public void writeToDashboard() {}
 
     public abstract void stop();
 
     public void zeroSensors() {}
 
     public void registerEnabledLoops(ILooper enabledLooper) {}
-
-    public void registerLogger(LoggingSystem LS) {}
 
     public abstract boolean checkSystem();
 

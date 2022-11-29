@@ -42,7 +42,7 @@ public class Controller {
     }
 
     public double getSwerveRotation() {
-        double rotAxis = (driver.getAxis(Side.RIGHT, Axis.X) / Math.abs(driver.getAxis(Side.RIGHT, Axis.X)) * Math.pow(driver.getAxis(Side.RIGHT, Axis.X),2));
+        double rotAxis = Math.pow(driver.getAxis(Side.RIGHT, Axis.X),3) * DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND;
 
         if (Math.abs(rotAxis) < swerveDeadband) {
             return 0.0;

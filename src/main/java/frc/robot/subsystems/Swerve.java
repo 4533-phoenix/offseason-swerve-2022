@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import frc.robot.Constants.*;
 import frc.robot.loops.*;
-import frc.robot.logger.*;
 
 import frc.robot.subsystems.*;
 
@@ -17,18 +16,18 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.MatBuilder;
 
 import java.util.*;
 
 public class Swerve extends Subsystem {
     private static Swerve mInstance;
-
-    public PeriodicIO mPeriodicIO = new PeriodicIO();
-
-    LogStorage<PeriodicIO> mStorage = null;
 
     public boolean isEnabled = false;
 
@@ -80,6 +79,15 @@ public class Swerve extends Subsystem {
 
     public SwerveModule[] swerveMods;
 
+    private SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
+        getRotation2d(), 
+        new Pose2d(), 
+        DriveConstants.SWERVE_KINEMATICS, 
+        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(), 
+        new MatBuilder<>(Nat.N1(), Nat.N1()).fill(), 
+        new MatBuilder<>(Nat.N3(), Nat.N1()).fill()
+    );
+
     public Swerve() {
         new Thread(() -> {
             try {
@@ -101,11 +109,11 @@ public class Swerve extends Subsystem {
     }
 
     public double getHeading() {
-        return Math.IEEEremainder(gyro.getAngle(), 360);
+        return 360.0 - Math.IEEEremainder(gyro.getAngle(), 360.0);
     }
 
     public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(360.0 - getHeading());
+        return Rotation2d.fromDegrees(getHeading());
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -180,53 +188,9 @@ public class Swerve extends Subsystem {
     }
 
     @Override
-    public void readPeriodicInputs() {
-        mPeriodicIO.gyro_heading = new Rotation2d(gyro.getYaw()).getDegrees();
-        mPeriodicIO.robot_pitch = new Rotation2d(gyro.getPitch()).getDegrees();
-        mPeriodicIO.robot_roll = new Rotation2d(gyro.getRoll()).getDegrees();
-        mPeriodicIO.swerve_heading = MathUtil.inputModulus(new Rotation2d(gyro.getYaw()).getDegrees(), 0, 360);
-
-        sendLog();
-    }
-
-    public static class PeriodicIO {
-        // inputs
-        public double gyro_heading;
-        public double robot_pitch;
-        public double robot_roll;
-        public double swerve_heading;
-
-        public double angular_velocity;
-        public double goal_velocity;
-    }
-
-    //logger
-    @Override
-    public void registerLogger(LoggingSystem LS) {
-        setupLog();
-        LS.register(mStorage, "SWERVE_LOGS.csv");
-    }
-    
-    public void setupLog() {
-        mStorage = new LogStorage<PeriodicIO>();
-
-        ArrayList<String> headers = new ArrayList<String>();
-        headers.add("timestamp");
-        headers.add("is_enabled");
-        headers.add("gyro_heading");
-        headers.add("robot_pitch");
-        headers.add("robot_roll");
-        headers.add("swerve_heading");
-
-        mStorage.setHeaders(headers);
-    }
-
-    public void sendLog() {
-        ArrayList<Number> items = new ArrayList<Number>();
-        items.add(isEnabled ? 1.0 : 0.0);
-        items.add(mPeriodicIO.gyro_heading);
-        items.add(mPeriodicIO.robot_pitch);
-        items.add(mPeriodicIO.robot_roll);
-        items.add(mPeriodicIO.swerve_heading);
+    public void writeToDashboard() {
+        SmartDashboard.putNumber("Robot heading", getHeading());
+        SmartDashboard.putNumber("Robot pitch", gyro.getPitch());
+        SmartDashboard.putNumber("Robot roll", gyro.getRoll());
     }
 }

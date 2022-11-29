@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.loops.Looper;
 import frc.robot.subsystems.Swerve;
 import frc.robot.controls.Controller;
-import frc.robot.logger.*;
 
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -27,17 +26,12 @@ public class Robot extends TimedRobot {
   private final Looper mEnabledLooper = new Looper();
   private final Looper mDisabledLooper = new Looper();
 
-  // Instantiate logging looper
-  private final Looper mLoggingLooper = new Looper();
-
   // Controller instance
   private final Controller mController = Controller.getInstance();
 
   // Subsystem instances
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
   private final Swerve mSwerve = Swerve.getInstance();
-
-  private LoggingSystem mLogger = LoggingSystem.getInstance();
 
   @Override
   public void robotInit() {
@@ -49,8 +43,6 @@ public class Robot extends TimedRobot {
       mSubsystemManager.registerEnabledLoops(mEnabledLooper);
       mSubsystemManager.registerDisabledLoops(mDisabledLooper);
 
-      mSubsystemManager.registerLoggingSystems(mLogger);
-      mLogger.registerLoops(mLoggingLooper);
     } catch (Throwable t) {
       throw t;
     }
@@ -67,7 +59,6 @@ public class Robot extends TimedRobot {
     try {
       mDisabledLooper.stop();
 			mEnabledLooper.start();
-      mLoggingLooper.start();
     } catch (Throwable t) {
       throw t;
     }
@@ -83,7 +74,6 @@ public class Robot extends TimedRobot {
     try {
       mDisabledLooper.stop();
 			mEnabledLooper.start();
-      mLoggingLooper.start();
     } catch (Throwable t) {
       throw t;
     }
@@ -106,7 +96,6 @@ public class Robot extends TimedRobot {
     try {
       mEnabledLooper.stop();
 			mDisabledLooper.start();
-      mLoggingLooper.stop();
     } catch (Throwable t) {
       throw t;
     }
@@ -126,7 +115,6 @@ public class Robot extends TimedRobot {
     try {
       mEnabledLooper.stop();
 			mDisabledLooper.stop();
-      mLoggingLooper.stop();
     } catch (Throwable t) {
       throw t;
     }
