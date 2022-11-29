@@ -29,8 +29,8 @@ public class Controller {
     // DRIVER CONTROLS
     
     public Translation2d getSwerveTranslation() {
-        double forwardAxis = (driver.getAxis(Side.LEFT, Axis.Y) / Math.abs(driver.getAxis(Side.LEFT, Axis.Y)) * Math.pow(driver.getAxis(Side.LEFT, Axis.Y),2));
-        double strafeAxis = (driver.getAxis(Side.LEFT, Axis.X) / Math.abs(driver.getAxis(Side.LEFT, Axis.X)) * Math.pow(driver.getAxis(Side.LEFT, Axis.X),2));
+        double forwardAxis = Math.pow(driver.getAxis(Side.LEFT, Axis.Y),3) * DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND;
+        double strafeAxis = Math.pow(driver.getAxis(Side.LEFT, Axis.X),3) * DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND;
 
         Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
