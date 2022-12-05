@@ -1,9 +1,10 @@
 package frc.robot.subsystems;
 
-import frc.robot.Constants.*;
+import frc.robot.controls.*;
+import frc.robot.controls.PSController.Button;
 import frc.robot.loops.*;
-
 import frc.robot.subsystems.*;
+import frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -28,8 +29,6 @@ import java.util.*;
 
 public class Swerve extends Subsystem {
     private static Swerve mInstance;
-
-    public boolean isEnabled = false;
 
     private final SwerveModule frontLeft = new SwerveModule(
         DriveConstants.FRONT_LEFT_DRIVE_MOTOR_ID,
@@ -89,12 +88,7 @@ public class Swerve extends Subsystem {
     );
 
     public Swerve() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                zeroHeading();
-            } catch (Exception e) {}
-        }).start();
+        this.zeroHeading();
     }
 
     public static Swerve getInstance() {
@@ -109,11 +103,11 @@ public class Swerve extends Subsystem {
     }
 
     public double getHeading() {
-        return 360.0 - Math.IEEEremainder(gyro.getAngle(), 360.0);
+        return (-this.gyro.getYaw() + 180) % 360;
     }
 
     public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getHeading());
+        return Rotation2d.fromDegrees(this.getHeading());
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -122,13 +116,6 @@ public class Swerve extends Subsystem {
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
         backRight.setDesiredState(desiredStates[3]);
-    }
-
-    public void printModuleOffsets() {
-        System.out.println("Left front: " + frontLeft.getAbsoluteEncoderRad());
-        System.out.println("Right front: " + frontRight.getAbsoluteEncoderRad());
-        System.out.println("Left back: " + backLeft.getAbsoluteEncoderRad());
-        System.out.println("Right back: " + backRight.getAbsoluteEncoderRad());
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -154,36 +141,85 @@ public class Swerve extends Subsystem {
 
         SwerveModuleState[] moduleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
-        setModuleStates(moduleStates);
+        this.setModuleStates(moduleStates);
+    }
+
+    private static class SwerveLoops {
+        public Loop defaultDriveLoop() {
+            return new Loop() {
+                @Override
+                public void onStart(double timestamp) {
+                    Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
+                }
+
+                @Override
+                public void onLoop(double timestamp) {
+                    Translation2d swerveTranslation = DriveController.getInstance().getSwerveTranslation();
+                    double swerveRotation = DriveController.getInstance().getSwerveRotation();
+
+                    Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
+                }
+
+                @Override
+                public void onStop(double timestamp) {
+                    Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
+                }
+            };
+        }
+
+        public Loop swervePeriodic() {
+            return new Loop() {
+                @Override
+                public void onStart(double timestamp) {}
+
+                @Override
+                public void onLoop(double timestamp) {
+                    Swerve.getInstance().writeToDashboard();
+                }
+
+                @Override
+                public void onStop(double timestamp) {}
+            };
+        }
+
+        public Loop startButton() {
+            return new Loop() {
+                @Override
+                public void onStart(double timestamp) {}
+
+                @Override
+                public void onLoop(double timestamp) {
+                    if (DriveController.getInstance().getButton(Button.START)) {
+                        Swerve.getInstance().zeroHeading();
+                    }
+                }
+
+                @Override
+                public void onStop(double timestamp) {}
+            };
+        }
     }
 
     @Override
     public void registerEnabledLoops(ILooper mEnabledLooper) {
-        mEnabledLooper.register(new Loop() {
-            @Override
-            public void onStart(double timestamp) {
-                isEnabled = true;
-            }
+        SwerveLoops swerveLoops = new SwerveLoops();
 
-            @Override
-            public void onLoop(double timestamp) {
-                isEnabled = false;
-            }
-
-            @Override
-            public void onStop(double timestamp) {
-                stop();
-            }
-        });
+        mEnabledLooper.register(swerveLoops.defaultDriveLoop());
+        mEnabledLooper.register(swerveLoops.swervePeriodic());
+        mEnabledLooper.register(swerveLoops.startButton());
     }
 
     @Override
     public void stop() {
-        isEnabled = true;
+        // TODO: Add code that will fully stop this subsystem
     }
 
     @Override
     public boolean checkSystem() {
+        // TODO: Add code that checks possible system faults (should be SERIOUS FAULTS)
+        // Serious faults should be things that could damage or hurt other people/things
+        // Serious faults due to the fact that stop() will most likely be called
+        // after this returning false
         return true;
     }
 

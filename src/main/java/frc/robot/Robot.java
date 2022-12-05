@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 
 import frc.robot.loops.Looper;
 import frc.robot.subsystems.Swerve;
-import frc.robot.controls.Controller;
-
+import frc.robot.controls.DriveController;
+import frc.robot.controls.PSController.Button;
 import edu.wpi.first.math.geometry.Translation2d;
 
 import java.util.*;
@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
   private final Looper mDisabledLooper = new Looper();
 
   // Controller instance
-  private final Controller mController = Controller.getInstance();
+  private final DriveController mController = DriveController.getInstance();
 
   // Subsystem instances
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
@@ -35,93 +35,54 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    try {
-      mSubsystemManager.setSubsystems(
-        mSwerve
-      );
+    mSubsystemManager.setSubsystems(
+      mSwerve
+    );
 
-      mSubsystemManager.registerEnabledLoops(mEnabledLooper);
-      mSubsystemManager.registerDisabledLoops(mDisabledLooper);
-
-    } catch (Throwable t) {
-      throw t;
-    }
+    mSubsystemManager.registerEnabledLoops(mEnabledLooper);
+    mSubsystemManager.registerDisabledLoops(mDisabledLooper);
   }
 
   @Override
   public void robotPeriodic() {
-    mEnabledLooper.outputToSmartDashboard();
-    mSwerve.printModuleOffsets();
+    mEnabledLooper.loop();
   }
 
   @Override
   public void autonomousInit() {
-    try {
-      mDisabledLooper.stop();
-			mEnabledLooper.start();
-    } catch (Throwable t) {
-      throw t;
-    }
+    mDisabledLooper.stop();
+    mEnabledLooper.start();
   }
 
   @Override
-  public void autonomousPeriodic() {
-
-  }
+  public void autonomousPeriodic() {}
 
   @Override
   public void teleopInit() {
-    try {
-      mDisabledLooper.stop();
-			mEnabledLooper.start();
-    } catch (Throwable t) {
-      throw t;
-    }
+    mDisabledLooper.stop();
+    mEnabledLooper.start();
   }
 
   @Override
-  public void teleopPeriodic() {
-    if (mController.zeroGyro())
-      mSwerve.zeroHeading();
-
-    Translation2d swerveTranslation = new Translation2d(mController.getSwerveTranslation().getX(),
-        mController.getSwerveTranslation().getY());
-    double swerveRotation = mController.getSwerveRotation();
-
-    mSwerve.drive(swerveTranslation, swerveRotation, true, true);
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void disabledInit() {
-    try {
-      mEnabledLooper.stop();
-			mDisabledLooper.start();
-    } catch (Throwable t) {
-      throw t;
-    }
+    mEnabledLooper.stop();
+    mDisabledLooper.start();
   }
 
   @Override
   public void disabledPeriodic() {
-    try {
-      mDisabledLooper.outputToSmartDashboard();
-    } catch (Throwable t) {
-      throw t;
-    }
+    mDisabledLooper.loop();
   }
 
   @Override
   public void testInit() {
-    try {
-      mEnabledLooper.stop();
-			mDisabledLooper.stop();
-    } catch (Throwable t) {
-      throw t;
-    }
+    mEnabledLooper.stop();
+    mDisabledLooper.stop();
   }
 
   @Override
-  public void testPeriodic() {
-
-  }
+  public void testPeriodic() {}
 }

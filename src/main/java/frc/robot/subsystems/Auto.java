@@ -39,12 +39,19 @@ public class Auto extends Subsystem {
     }
 
     @Override
+    public void registerEnabledLoops(ILooper looper) {}
+
+    @Override
     public void stop() {
-        isEnabled = true;
+        // TODO: Add code that will fully stop this subsystem
     }
 
     @Override
     public boolean checkSystem() {
+        // TODO: Add code that checks possible system faults (should be SERIOUS FAULTS)
+        // Serious faults should be things that could damage or hurt other people/things
+        // Serious faults due to the fact that stop() will most likely be called
+        // after this returning false
         return true;
     }
 }

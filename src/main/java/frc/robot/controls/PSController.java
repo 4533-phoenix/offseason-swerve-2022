@@ -29,7 +29,7 @@ public class PSController {
         mController = new XboxController(port);
     }
 
-    double getAxis(Side side, Axis axis) {
+    public double getAxis(Side side, Axis axis) {
         boolean left = side == Side.LEFT;
         boolean y = axis == Axis.Y;
         return mController.getRawAxis((left ? 0 : 4) + (y ? 1 : 0));

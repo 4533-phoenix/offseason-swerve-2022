@@ -18,8 +18,6 @@ public class Looper implements ILooper {
     private final List<Loop> loops_;
     private final Object taskRunningLock_ = new Object();
     private double timestamp_ = 0;
-    private double dt_ = 0;
-    public double dt(){ return dt_; }
 
     public Looper() {
         running_ = false;
@@ -46,6 +44,19 @@ public class Looper implements ILooper {
         }
     }
 
+    public synchronized void loop() {
+        if (running_) {
+            System.out.println("Looping loops");
+            synchronized (taskRunningLock_) {
+                timestamp_ = Timer.getFPGATimestamp();
+                for (Loop loop : loops_) {
+                    loop.onLoop(timestamp_);
+                }
+                running_ = true;
+            }
+        }
+    }
+
     public synchronized void stop() {
         if (running_) {
             System.out.println("Stopping loops");
@@ -58,9 +69,5 @@ public class Looper implements ILooper {
                 }
             }
         }
-    }
-
-    public void outputToSmartDashboard() {
-        SmartDashboard.putNumber("looper_dt", dt_);
     }
 }

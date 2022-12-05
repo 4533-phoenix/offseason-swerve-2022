@@ -7,30 +7,28 @@ import frc.robot.controls.PSController.Side;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-public class Controller {
+public class DriveController extends PSController {
     private final double swerveDeadband = OIConstants.DRIVE_DEADBAND;
 
-    private static Controller mInstance = null;
+    private static DriveController mInstance = null;
 
-    public static Controller getInstance() {
+    public static DriveController getInstance() {
         if (mInstance == null) {
-            mInstance = new Controller();
+            mInstance = new DriveController();
         }
 
         return mInstance;
     }
 
-    public final PSController driver;
-
-    private Controller() {
-        driver = new PSController(OIConstants.DRIVER_CONTROLLER_PORT);
+    private DriveController() {
+        super(OIConstants.DRIVER_CONTROLLER_PORT);
     }
 
     // DRIVER CONTROLS
     
     public Translation2d getSwerveTranslation() {
-        double forwardAxis = Math.pow(driver.getAxis(Side.LEFT, Axis.Y),3) * DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND;
-        double strafeAxis = Math.pow(driver.getAxis(Side.LEFT, Axis.X),3) * DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND;
+        double forwardAxis = Math.pow(this.getAxis(Side.LEFT, Axis.Y), 3) * DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND;
+        double strafeAxis = Math.pow(this.getAxis(Side.LEFT, Axis.X), 3) * DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND;
 
         Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
@@ -42,16 +40,12 @@ public class Controller {
     }
 
     public double getSwerveRotation() {
-        double rotAxis = Math.pow(driver.getAxis(Side.RIGHT, Axis.X),3) * DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND;
+        double rotAxis = Math.pow(this.getAxis(Side.RIGHT, Axis.X), 3) * DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND;
 
         if (Math.abs(rotAxis) < swerveDeadband) {
             return 0.0;
         } else {
             return rotAxis;
         }
-    }
-
-    public boolean zeroGyro() {
-        return driver.getButton(Button.START);
     }
 }
