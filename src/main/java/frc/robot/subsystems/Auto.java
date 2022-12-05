@@ -5,6 +5,8 @@ import frc.robot.loops.*;
 
 import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import java.io.File;
+import java.util.Scanner;
 
 
 public class Auto extends Subsystem {
@@ -36,6 +38,10 @@ public class Auto extends Subsystem {
             mInstance = new Auto();
         }
         return mInstance;
+    }
+
+    public Auto() {
+
     }
 
     @Override
