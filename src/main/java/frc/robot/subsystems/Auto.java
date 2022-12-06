@@ -37,12 +37,11 @@ public class Auto extends Subsystem {
         if (mInstance == null) {
             mInstance = new Auto();
         }
+
         return mInstance;
     }
 
-    public Auto() {
-
-    }
+    public Auto() {}
 
     @Override
     public void registerEnabledLoops(ILooper looper) {}

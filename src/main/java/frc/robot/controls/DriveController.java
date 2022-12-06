@@ -1,10 +1,6 @@
 package frc.robot.controls;
 
 import frc.robot.Constants.*;
-import frc.robot.controls.PSController.Axis;
-import frc.robot.controls.PSController.Button;
-import frc.robot.controls.PSController.Side;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class DriveController extends PSController {

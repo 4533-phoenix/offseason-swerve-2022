@@ -7,12 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 import frc.robot.loops.Looper;
-import frc.robot.subsystems.Swerve;
-import frc.robot.controls.DriveController;
-import frc.robot.controls.PSController.Button;
-import edu.wpi.first.math.geometry.Translation2d;
-
-import java.util.*;
+import frc.robot.subsystems.SwerveSystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -21,22 +16,18 @@ import java.util.*;
  * project.
  */
 public class Robot extends TimedRobot {
-
   // Instantiate enabled and disabled loopers
   private final Looper mEnabledLooper = new Looper();
   private final Looper mDisabledLooper = new Looper();
 
-  // Controller instance
-  private final DriveController mController = DriveController.getInstance();
-
   // Subsystem instances
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
-  private final Swerve mSwerve = Swerve.getInstance();
+  private final SwerveSystem mSwerveSystem = SwerveSystem.getInstance();
 
   @Override
   public void robotInit() {
     mSubsystemManager.setSubsystems(
-      mSwerve
+      mSwerveSystem
     );
 
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);

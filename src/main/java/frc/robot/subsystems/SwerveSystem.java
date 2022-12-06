@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import frc.robot.controls.*;
 import frc.robot.controls.PSController.Button;
 import frc.robot.loops.*;
-import frc.robot.subsystems.*;
 import frc.robot.Constants.*;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -15,20 +14,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.MatBuilder;
 
-import java.util.*;
+public class SwerveSystem extends Subsystem {
+    private static SwerveSystem mInstance;
 
-public class Swerve extends Subsystem {
-    private static Swerve mInstance;
+    private SwerveModule[] swerveMods;
 
     private final SwerveModule frontLeft = new SwerveModule(
         DriveConstants.FRONT_LEFT_DRIVE_MOTOR_ID,
@@ -76,38 +71,37 @@ public class Swerve extends Subsystem {
 
     private final AHRS gyro = new AHRS(SPI.Port.kMXP);
 
-    public SwerveModule[] swerveMods;
+    private Pose2d swervePose = new Pose2d();
 
     private SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
-        getRotation2d(), 
-        new Pose2d(), 
+        Rotation2d.fromDegrees(-this.gyro.getAngle()), 
+        this.swervePose, 
         DriveConstants.SWERVE_KINEMATICS, 
-        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(), 
-        new MatBuilder<>(Nat.N1(), Nat.N1()).fill(), 
-        new MatBuilder<>(Nat.N3(), Nat.N1()).fill()
+        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01), 
+        new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.01), 
+        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01)
     );
 
-    public Swerve() {
-        this.zeroHeading();
+    public SwerveSystem() {
+        this.zeroGyro();
+
+        this.swerveMods = new SwerveModule[]{
+           frontLeft,
+           frontRight,
+           backLeft,
+           backRight 
+        };
     }
 
-    public static Swerve getInstance() {
+    public static SwerveSystem getInstance() {
         if (mInstance == null) {
-            mInstance = new Swerve();
+            mInstance = new SwerveSystem();
         }
         return mInstance;
     }
 
-    public void zeroHeading() {
-        gyro.reset();
-    }
-
-    public double getHeading() {
-        return (-this.gyro.getYaw() + 180) % 360;
-    }
-
-    public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(this.getHeading());
+    public void zeroGyro() {
+        this.gyro.reset();
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -134,7 +128,8 @@ public class Swerve extends Subsystem {
         ChassisSpeeds chassisSpeeds;
         if (fieldRelative) {
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                xSpeed, ySpeed, steerSpeed, getRotation2d());
+                xSpeed, ySpeed, steerSpeed, this.swervePose.getRotation()
+            );
         } else {
             chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, steerSpeed);
         }
@@ -144,12 +139,12 @@ public class Swerve extends Subsystem {
         this.setModuleStates(moduleStates);
     }
 
-    private static class SwerveLoops {
+    private static final class SwerveLoops {
         public Loop defaultDriveLoop() {
             return new Loop() {
                 @Override
                 public void onStart(double timestamp) {
-                    Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
+                    SwerveSystem.getInstance().drive(new Translation2d(), 0.0, true, true);
                 }
 
                 @Override
@@ -157,12 +152,12 @@ public class Swerve extends Subsystem {
                     Translation2d swerveTranslation = DriveController.getInstance().getSwerveTranslation();
                     double swerveRotation = DriveController.getInstance().getSwerveRotation();
 
-                    Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
+                    SwerveSystem.getInstance().drive(swerveTranslation, swerveRotation, true, true);
                 }
 
                 @Override
                 public void onStop(double timestamp) {
-                    Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
+                    SwerveSystem.getInstance().drive(new Translation2d(), 0.0, true, true);
                 }
             };
         }
@@ -174,7 +169,22 @@ public class Swerve extends Subsystem {
 
                 @Override
                 public void onLoop(double timestamp) {
-                    Swerve.getInstance().writeToDashboard();
+                    SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
+
+                    for (int i = 0; i < 4; i++) {
+                        swerveModuleStates[i] = SwerveSystem.getInstance().swerveMods[i].getState();
+                    }
+
+                    SwerveSystem.getInstance().swervePose = 
+                        SwerveSystem.getInstance().swervePoseEstimator.update(
+                            Rotation2d.fromDegrees(-SwerveSystem.getInstance().gyro.getAngle()),
+                            swerveModuleStates[0],
+                            swerveModuleStates[1],
+                            swerveModuleStates[2],
+                            swerveModuleStates[3]
+                        );
+
+                    SwerveSystem.getInstance().writeToDashboard();
                 }
 
                 @Override
@@ -190,7 +200,7 @@ public class Swerve extends Subsystem {
                 @Override
                 public void onLoop(double timestamp) {
                     if (DriveController.getInstance().getButton(Button.START)) {
-                        Swerve.getInstance().zeroHeading();
+                        SwerveSystem.getInstance().zeroGyro();
                     }
                 }
 
@@ -225,8 +235,8 @@ public class Swerve extends Subsystem {
 
     @Override
     public void writeToDashboard() {
-        SmartDashboard.putNumber("Robot heading", getHeading());
-        SmartDashboard.putNumber("Robot pitch", gyro.getPitch());
-        SmartDashboard.putNumber("Robot roll", gyro.getRoll());
+        SmartDashboard.putNumber("Robot Heading", this.swervePose.getRotation().getDegrees());
+        SmartDashboard.putNumber("Robot Pitch", this.gyro.getPitch());
+        SmartDashboard.putNumber("Robot Roll", this.gyro.getRoll());
     }
 }

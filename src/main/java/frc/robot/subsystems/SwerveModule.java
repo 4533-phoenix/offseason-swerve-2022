@@ -12,12 +12,15 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class SwerveModule {
+    // TODO: Make a Profiled PID Controller and a Feedforward Controller for the drive motor 
     private final CANSparkMax driveMotor;
+
     private final CANSparkMax steerMotor;
 
     private final RelativeEncoder driveEncoder;
     private final RelativeEncoder steerEncoder;
 
+    // TODO: Make this a Profiled PID Controller, and add a Feedforward Controller as well
     private final PIDController steerPIDController;
 
     private final CANCoder absoluteEncoder;
@@ -28,42 +31,42 @@ public class SwerveModule {
             int absoluteEncoderID, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
         this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
-        absoluteEncoder = new CANCoder(absoluteEncoderID);
+        this.absoluteEncoder = new CANCoder(absoluteEncoderID);
         
-        driveMotor = new CANSparkMax(driveMotorID, MotorType.kBrushless);
-        steerMotor = new CANSparkMax(steerMotorID, MotorType.kBrushless);
+        this.driveMotor = new CANSparkMax(driveMotorID, MotorType.kBrushless);
+        this.steerMotor = new CANSparkMax(steerMotorID, MotorType.kBrushless);
 
-        driveMotor.setInverted(driveMotorReversed);
-        steerMotor.setInverted(steerMotorReversed);
+        this.driveMotor.setInverted(driveMotorReversed);
+        this.steerMotor.setInverted(steerMotorReversed);
 
-        driveEncoder = driveMotor.getEncoder();
-        steerEncoder = steerMotor.getEncoder();
+        this.driveEncoder = this.driveMotor.getEncoder();
+        this.steerEncoder = this.steerMotor.getEncoder();
 
-        driveEncoder.setPositionConversionFactor(ModuleConstants.DRIVE_ENCODER_METERS_PER_ROTATION);
-        driveEncoder.setVelocityConversionFactor(ModuleConstants.DRIVE_ENCODER_METERS_PER_SECOND);
-        steerEncoder.setPositionConversionFactor(ModuleConstants.STEER_ENCODER_RADIANS_PER_ROTATION);
-        steerEncoder.setVelocityConversionFactor(ModuleConstants.STEER_ENCODER_RADIANS_PER_SECOND);
+        this.driveEncoder.setPositionConversionFactor(ModuleConstants.DRIVE_ENCODER_METERS_PER_ROTATION);
+        this.driveEncoder.setVelocityConversionFactor(ModuleConstants.DRIVE_ENCODER_METERS_PER_SECOND);
+        this.steerEncoder.setPositionConversionFactor(ModuleConstants.STEER_ENCODER_RADIANS_PER_ROTATION);
+        this.steerEncoder.setVelocityConversionFactor(ModuleConstants.STEER_ENCODER_RADIANS_PER_SECOND);
 
-        steerPIDController = new PIDController(ModuleConstants.STEER_KP, 0, 0);
-        steerPIDController.enableContinuousInput(-Math.PI, Math.PI);
+        this.steerPIDController = new PIDController(ModuleConstants.STEER_KP, 0.0, 0.0);
+        this.steerPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
-        resetEncoders();
+        this.resetEncoders();
     }
 
     public double getDrivePosition() {
-        return driveEncoder.getPosition();
+        return this.driveEncoder.getPosition();
     }
 
     public double getSteerPosition() {
-        return steerEncoder.getPosition();
+        return this.steerEncoder.getPosition();
     }
 
     public double getDriveVelocity() {
-        return driveEncoder.getVelocity();
+        return this.driveEncoder.getVelocity();
     }
 
     public double getSteerVelocity() {
-        return steerEncoder.getVelocity();
+        return this.steerEncoder.getVelocity();
     }
 
     public double getAbsoluteEncoderRad() {
@@ -75,30 +78,32 @@ public class SwerveModule {
         if (angle < 0.0)
             angle += 2.0 * Math.PI;
 
-        return angle * (absoluteEncoderReversed ? -1.0 : 1.0);
+        return angle * (this.absoluteEncoderReversed ? -1.0 : 1.0);
     }
 
     public void resetEncoders() {
-        driveEncoder.setPosition(0);
-        steerEncoder.setPosition(getAbsoluteEncoderRad());
+        this.driveEncoder.setPosition(0.0);
+        this.steerEncoder.setPosition(this.getAbsoluteEncoderRad());
     }
 
     public SwerveModuleState getState() {
-        return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getSteerPosition()));
+        return new SwerveModuleState(this.getDriveVelocity(), new Rotation2d(this.getSteerPosition()));
     }
 
     public void setDesiredState(SwerveModuleState state) {
         if (Math.abs(state.speedMetersPerSecond) < 0.001) {
-            stop();
+            this.stop();
             return;
         }
-        state = SwerveModuleState.optimize(state, getState().angle);
-        driveMotor.set(state.speedMetersPerSecond / DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND);
-        steerMotor.set(steerPIDController.calculate(getSteerPosition(), state.angle.getRadians()));
+
+        state = SwerveModuleState.optimize(state, this.getState().angle);
+
+        this.driveMotor.set(state.speedMetersPerSecond / DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND);
+        this.steerMotor.set(this.steerPIDController.calculate(this.getSteerPosition(), state.angle.getRadians()));
     }
 
     public void stop() {
-        driveMotor.set(0);
-        steerMotor.set(0);
+        this.driveMotor.set(0.0);
+        this.steerMotor.set(0.0);
     }
 }

@@ -15,15 +15,15 @@ import frc.robot.loops.ILooper;
  * instantializing all member components at the start of the match.
  */
 public abstract class Subsystem {
-    public void writeToDashboard() {}
-
-    public abstract void stop();
+    public void registerEnabledLoops(ILooper enabledLooper) {}
 
     public void zeroSensors() {}
 
-    public void registerEnabledLoops(ILooper enabledLooper) {}
-
     public abstract boolean checkSystem();
-
+    
+    public abstract void stop();
+    
+    public void writeToDashboard() {}
+    
     public boolean hasEmergency = false;
 }
