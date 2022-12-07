@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.MatBuilder;
 
-public final class SwerveSystem extends Subsystem {
-    private static SwerveSystem mInstance;
+public final class Swerve extends Subsystem {
+    private static Swerve mInstance;
 
     private SwerveModule[] swerveMods;
 
@@ -82,7 +82,7 @@ public final class SwerveSystem extends Subsystem {
         new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01)
     );
 
-    public SwerveSystem() {
+    public Swerve() {
         this.zeroGyro();
 
         this.swerveMods = new SwerveModule[]{
@@ -93,9 +93,9 @@ public final class SwerveSystem extends Subsystem {
         };
     }
 
-    public static SwerveSystem getInstance() {
+    public static Swerve getInstance() {
         if (mInstance == null) {
-            mInstance = new SwerveSystem();
+            mInstance = new Swerve();
         }
         return mInstance;
     }
@@ -153,7 +153,7 @@ public final class SwerveSystem extends Subsystem {
             return new Loop() {
                 @Override
                 public void onStart(double timestamp) {
-                    SwerveSystem.getInstance().drive(new Translation2d(), 0.0, true, true);
+                    Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
                 }
 
                 @Override
@@ -161,12 +161,12 @@ public final class SwerveSystem extends Subsystem {
                     Translation2d swerveTranslation = DriveController.getInstance().getSwerveTranslation();
                     double swerveRotation = DriveController.getInstance().getSwerveRotation();
 
-                    SwerveSystem.getInstance().drive(swerveTranslation, swerveRotation, true, true);
+                    Swerve.getInstance().drive(swerveTranslation, swerveRotation, true, true);
                 }
 
                 @Override
                 public void onStop(double timestamp) {
-                    SwerveSystem.getInstance().drive(new Translation2d(), 0.0, true, true);
+                    Swerve.getInstance().drive(new Translation2d(), 0.0, true, true);
                 }
             };
         }
@@ -181,19 +181,19 @@ public final class SwerveSystem extends Subsystem {
                     SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
 
                     for (int i = 0; i < 4; i++) {
-                        swerveModuleStates[i] = SwerveSystem.getInstance().swerveMods[i].getState();
+                        swerveModuleStates[i] = Swerve.getInstance().swerveMods[i].getState();
                     }
 
-                    SwerveSystem.getInstance().swervePose = 
-                        SwerveSystem.getInstance().swervePoseEstimator.update(
-                            Rotation2d.fromDegrees(-SwerveSystem.getInstance().gyro.getAngle()),
+                    Swerve.getInstance().swervePose = 
+                        Swerve.getInstance().swervePoseEstimator.update(
+                            Rotation2d.fromDegrees(-Swerve.getInstance().gyro.getAngle()),
                             swerveModuleStates[0],
                             swerveModuleStates[1],
                             swerveModuleStates[2],
                             swerveModuleStates[3]
                         );
 
-                    SwerveSystem.getInstance().writeToDashboard();
+                    Swerve.getInstance().writeToDashboard();
                 }
 
                 @Override
@@ -209,7 +209,7 @@ public final class SwerveSystem extends Subsystem {
                 @Override
                 public void onLoop(double timestamp) {
                     if (DriveController.getInstance().getButton(Button.START)) {
-                        SwerveSystem.getInstance().zeroGyro();
+                        Swerve.getInstance().zeroGyro();
                     }
                 }
 
