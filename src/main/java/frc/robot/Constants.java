@@ -100,7 +100,7 @@ public final class Constants {
         public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 3.5 * 2.0 * Math.PI;
 
         public static final double DRIVE_MAX_ACCELERATION = 5.0;
-        public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 3.0;
+        public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 10.0;
     }
 
 	public static final class OIConstants {

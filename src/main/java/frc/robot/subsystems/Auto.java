@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants.*;
+import frc.robot.auto.SwervePath;
+import frc.robot.auto.SwervePath.PathState;
 import frc.robot.loops.*;
 
 import edu.wpi.first.math.controller.*;
@@ -19,8 +21,8 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public final class AutoSystem extends Subsystem {
-    private static AutoSystem mInstance;
+public final class Auto extends Subsystem {
+    private static Auto mInstance;
 
     private boolean isEnabled = false;
 
@@ -43,15 +45,15 @@ public final class AutoSystem extends Subsystem {
         )
     );
 
-    public static AutoSystem getInstance() {
+    public static Auto getInstance() {
         if (mInstance == null) {
-            mInstance = new AutoSystem();
+            mInstance = new Auto();
         }
 
         return mInstance;
     }
 
-    public AutoSystem() {}
+    public Auto() {}
 
     public void enable() {
         this.isEnabled = true;
@@ -69,79 +71,38 @@ public final class AutoSystem extends Subsystem {
         return this.autoController;
     }
 
-    private static final class AutoSystemLoops {
-        public Loop testAutonomous() {
+    private static final class AutoLoops {
+        public Loop runDefaultAuto() {
             return new Loop() {
-                private Trajectory testAutonomousTrajectory;
+                private SwervePath testAuto = SwervePath.fromCSV("Test Path");
+                private SwervePath selectedAuto = testAuto;
                 
                 private boolean hasStarted = false;
                 private double startTime;
 
                 @Override
                 public void onStart(double timestamp) {
-                    TrajectoryConfig config = new TrajectoryConfig(
-                        DriveConstants.DRIVE_MAX_VELOCITY, 
-                        DriveConstants.DRIVE_MAX_ACCELERATION
-                    )
-                    .addConstraint(
-                        new MaxVelocityConstraint(
-                            DriveConstants.DRIVE_MAX_VELOCITY
-                        )
-                    )
-                    .addConstraint(
-                        new SwerveDriveKinematicsConstraint(
-                            DriveConstants.SWERVE_KINEMATICS, 
-                            DriveConstants.DRIVE_MAX_VELOCITY
-                        )
-                    );
-
-                    Pose2d startPose = SwerveSystem.getInstance().getSwervePose();
-
-                    ArrayList<Translation2d> trajectoryPoints = new ArrayList<Translation2d>(
-                        Arrays.asList(
-                            new Translation2d(startPose.getX() + 1, startPose.getY() + 1),
-                            new Translation2d(startPose.getX() + 2, startPose.getY() - 1)
-                        )
-                    );
-
-                    Pose2d endPose = new Pose2d(startPose.getX() + 3, startPose.getY(), startPose.getRotation());
-
-                    this.testAutonomousTrajectory = TrajectoryGenerator.generateTrajectory(
-                        startPose, 
-                        trajectoryPoints, 
-                        endPose, 
-                        config
-                    );
+                    startTime = timestamp;
                 }
 
                 @Override
                 public void onLoop(double timestamp) {
-                    if (AutoSystem.getInstance().isEnabled()) {
+                    if (Auto.getInstance().isEnabled()) {
                         double currTime = Timer.getFPGATimestamp();
 
-                        if (!this.hasStarted) {
-                            this.startTime = currTime;
+                        double time = currTime - startTime;
 
-                            this.hasStarted = true;
-                        }
+                        PathState currState = selectedAuto.sample(time);
 
-                        if (currTime - this.startTime > this.testAutonomousTrajectory.getTotalTimeSeconds()) {
-                            return;
-                        }
-
-                        HolonomicDriveController autoController = AutoSystem.getInstance().getAutoController();
-                        
-                        Trajectory.State trajectoryState = this.testAutonomousTrajectory.sample(currTime - this.startTime);
-
-                        ChassisSpeeds chassisSpeeds = autoController.calculate(
-                            SwerveSystem.getInstance().getSwervePose(),
-                            trajectoryState,
-                            trajectoryState.poseMeters.getRotation()
+                        ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
+                            Swerve.getInstance().getPoseEstimator().getEstimatedPosition(),
+                            currState.getTrajectoryState(),
+                            currState.rotation
                         );
 
-                        SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+                        SwerveModuleState[] desiredStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
-                        SwerveSystem.getInstance().drive(swerveModuleStates);
+                        Swerve.getInstance().setModuleStates(desiredStates);
                     }
                 }
 
@@ -153,9 +114,9 @@ public final class AutoSystem extends Subsystem {
 
     @Override
     public void registerEnabledLoops(ILooper looper) {
-        AutoSystemLoops autoSystemLoops = new AutoSystemLoops();
+        AutoLoops autoLoops = new AutoLoops();
 
-        looper.register(autoSystemLoops.testAutonomous());
+        looper.register(autoLoops.runDefaultAuto());
     }
 
     @Override

@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.MatBuilder;
 
-public final class Swerve extends Subsystem {
+public class Swerve extends Subsystem {
     private static Swerve mInstance;
 
     private SwerveModule[] swerveMods;
@@ -74,7 +74,7 @@ public final class Swerve extends Subsystem {
     private Pose2d swervePose = new Pose2d();
 
     private SwerveDrivePoseEstimator swervePoseEstimator = new SwerveDrivePoseEstimator(
-        Rotation2d.fromDegrees(-this.gyro.getAngle()), 
+        this.getGyroRotation2d(), 
         this.swervePose, 
         DriveConstants.SWERVE_KINEMATICS, 
         new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.02, 0.02, 0.01), 
@@ -83,7 +83,7 @@ public final class Swerve extends Subsystem {
     );
 
     public Swerve() {
-        this.zeroGyro();
+        this.zeroHeading();
 
         this.swerveMods = new SwerveModule[]{
            frontLeft,
@@ -100,17 +100,24 @@ public final class Swerve extends Subsystem {
         return mInstance;
     }
 
-    public void zeroGyro() {
+    public void zeroHeading() {
         this.gyro.reset();
     }
 
-    public Pose2d getSwervePose() {
-        return this.swervePose;
+    public double getHeading() {
+        return 360.0 - (gyro.getYaw() + 180.0);
+    }
+
+    public Rotation2d getGyroRotation2d() {
+        return Rotation2d.fromDegrees(this.getHeading());
+    }
+
+    public SwerveDrivePoseEstimator getPoseEstimator() {
+        return this.swervePoseEstimator;
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.DRIVE_MAX_VELOCITY);
-        
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
@@ -144,12 +151,8 @@ public final class Swerve extends Subsystem {
         this.setModuleStates(moduleStates);
     }
 
-    public void drive(SwerveModuleState[] swerveModuleStates) {
-        this.setModuleStates(swerveModuleStates);
-    }
-
-    private static final class SwerveSystemLoops {
-        public Loop defaultDriveLoop() {
+    private static final class SwerveLoops {
+        public Loop joystickDrive() {
             return new Loop() {
                 @Override
                 public void onStart(double timestamp) {
@@ -171,7 +174,7 @@ public final class Swerve extends Subsystem {
             };
         }
 
-        public Loop swervePeriodic() {
+        public Loop poseUpdate() {
             return new Loop() {
                 @Override
                 public void onStart(double timestamp) {}
@@ -186,7 +189,7 @@ public final class Swerve extends Subsystem {
 
                     Swerve.getInstance().swervePose = 
                         Swerve.getInstance().swervePoseEstimator.update(
-                            Rotation2d.fromDegrees(-Swerve.getInstance().gyro.getAngle()),
+                            Swerve.getInstance().getGyroRotation2d(),
                             swerveModuleStates[0],
                             swerveModuleStates[1],
                             swerveModuleStates[2],
@@ -201,7 +204,7 @@ public final class Swerve extends Subsystem {
             };
         }
 
-        public Loop startButton() {
+        public Loop resetFieldRelative() {
             return new Loop() {
                 @Override
                 public void onStart(double timestamp) {}
@@ -209,7 +212,7 @@ public final class Swerve extends Subsystem {
                 @Override
                 public void onLoop(double timestamp) {
                     if (DriveController.getInstance().getButton(Button.START)) {
-                        Swerve.getInstance().zeroGyro();
+                        Swerve.getInstance().zeroHeading();
                     }
                 }
 
@@ -221,11 +224,11 @@ public final class Swerve extends Subsystem {
 
     @Override
     public void registerEnabledLoops(ILooper mEnabledLooper) {
-        SwerveSystemLoops swerveSystemLoops = new SwerveSystemLoops();
+        SwerveLoops swerveLoops = new SwerveLoops();
 
-        mEnabledLooper.register(swerveSystemLoops.defaultDriveLoop());
-        mEnabledLooper.register(swerveSystemLoops.swervePeriodic());
-        mEnabledLooper.register(swerveSystemLoops.startButton());
+        mEnabledLooper.register(swerveLoops.joystickDrive());
+        mEnabledLooper.register(swerveLoops.poseUpdate());
+        mEnabledLooper.register(swerveLoops.resetFieldRelative());
     }
 
     @Override
@@ -244,8 +247,12 @@ public final class Swerve extends Subsystem {
 
     @Override
     public void writeToDashboard() {
-        SmartDashboard.putNumber("Robot Heading", this.swervePose.getRotation().getDegrees());
-        SmartDashboard.putNumber("Robot Pitch", this.gyro.getPitch());
-        SmartDashboard.putNumber("Robot Roll", this.gyro.getRoll());
+        SmartDashboard.putNumber("Robot Pose - X", this.swervePoseEstimator.getEstimatedPosition().getX());
+        SmartDashboard.putNumber("Robot Pose - Y", this.swervePoseEstimator.getEstimatedPosition().getY());
+        SmartDashboard.putNumber("Robot Pose - Angle", this.swervePoseEstimator.getEstimatedPosition().getRotation().getDegrees());
+
+        SmartDashboard.putNumber("Gyro Heading", this.getHeading());
+        SmartDashboard.putNumber("Gyro Pitch", this.gyro.getPitch());
+        SmartDashboard.putNumber("Gyro Roll", this.gyro.getRoll());
     }
 }
