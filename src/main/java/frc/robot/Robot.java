@@ -22,14 +22,14 @@ public final class Robot extends TimedRobot {
 
   // Subsystem instances
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
-  private final AutoSystem mAutoSystem = AutoSystem.getInstance();
-  private final SwerveSystem mSwerveSystem = SwerveSystem.getInstance();
+  private final Auto mAuto = Auto.getInstance();
+  private final Swerve mSwerve = Swerve.getInstance();
 
   @Override
   public void robotInit() {
     mSubsystemManager.setSubsystems(
-      mAutoSystem,
-      mSwerveSystem
+      mAuto,
+      mSwerve
     );
 
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);
@@ -46,7 +46,7 @@ public final class Robot extends TimedRobot {
   public void autonomousInit() {
     mDisabledLooper.stop();
 
-    mAutoSystem.enable();
+    mAuto.enable();
 
     mEnabledLooper.start();
   }
@@ -58,7 +58,7 @@ public final class Robot extends TimedRobot {
   public void teleopInit() {
     mDisabledLooper.stop();
 
-    mAutoSystem.disable();
+    mAuto.disable();
 
     mEnabledLooper.start();
   }
