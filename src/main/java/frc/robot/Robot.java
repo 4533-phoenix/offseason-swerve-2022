@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 import frc.robot.loops.Looper;
-import frc.robot.subsystems.SwerveSystem;
+import frc.robot.subsystems.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -15,22 +15,25 @@ import frc.robot.subsystems.SwerveSystem;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public final class Robot extends TimedRobot {
   // Instantiate enabled and disabled loopers
   private final Looper mEnabledLooper = new Looper();
   private final Looper mDisabledLooper = new Looper();
 
   // Subsystem instances
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
+  private final AutoSystem mAutoSystem = AutoSystem.getInstance();
   private final SwerveSystem mSwerveSystem = SwerveSystem.getInstance();
 
   @Override
   public void robotInit() {
     mSubsystemManager.setSubsystems(
+      mAutoSystem,
       mSwerveSystem
     );
 
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);
+
     mSubsystemManager.registerDisabledLoops(mDisabledLooper);
   }
 
@@ -42,6 +45,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     mDisabledLooper.stop();
+
+    mAutoSystem.enable();
+
     mEnabledLooper.start();
   }
 
@@ -51,6 +57,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     mDisabledLooper.stop();
+
+    mAutoSystem.disable();
+
     mEnabledLooper.start();
   }
 
@@ -60,6 +69,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     mEnabledLooper.stop();
+
     mDisabledLooper.start();
   }
 
@@ -71,6 +81,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     mEnabledLooper.stop();
+
     mDisabledLooper.stop();
   }
 

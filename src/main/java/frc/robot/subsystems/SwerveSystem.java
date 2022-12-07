@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.MatBuilder;
 
-public class SwerveSystem extends Subsystem {
+public final class SwerveSystem extends Subsystem {
     private static SwerveSystem mInstance;
 
     private SwerveModule[] swerveMods;
@@ -65,9 +65,9 @@ public class SwerveSystem extends Subsystem {
         DriveConstants.BACK_RIGHT_STEER_ABSOLUTE_ENCODER_REVERSED
     );
 
-    private SlewRateLimiter xLimiter = new SlewRateLimiter(DriveConstants.TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND);
-    private SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND);
-    private SlewRateLimiter steerLimiter = new SlewRateLimiter(DriveConstants.TELEOP_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND);
+    private SlewRateLimiter xLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
+    private SlewRateLimiter yLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ACCELERATION);
+    private SlewRateLimiter steerLimiter = new SlewRateLimiter(DriveConstants.DRIVE_MAX_ROTATIONAL_ACCELERATION);
 
     private final AHRS gyro = new AHRS(SPI.Port.kMXP);
 
@@ -104,8 +104,13 @@ public class SwerveSystem extends Subsystem {
         this.gyro.reset();
     }
 
+    public Pose2d getSwervePose() {
+        return this.swervePose;
+    }
+
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.DRIVE_MAX_VELOCITY);
+        
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
@@ -139,7 +144,11 @@ public class SwerveSystem extends Subsystem {
         this.setModuleStates(moduleStates);
     }
 
-    private static final class SwerveLoops {
+    public void drive(SwerveModuleState[] swerveModuleStates) {
+        this.setModuleStates(swerveModuleStates);
+    }
+
+    private static final class SwerveSystemLoops {
         public Loop defaultDriveLoop() {
             return new Loop() {
                 @Override
@@ -212,11 +221,11 @@ public class SwerveSystem extends Subsystem {
 
     @Override
     public void registerEnabledLoops(ILooper mEnabledLooper) {
-        SwerveLoops swerveLoops = new SwerveLoops();
+        SwerveSystemLoops swerveSystemLoops = new SwerveSystemLoops();
 
-        mEnabledLooper.register(swerveLoops.defaultDriveLoop());
-        mEnabledLooper.register(swerveLoops.swervePeriodic());
-        mEnabledLooper.register(swerveLoops.startButton());
+        mEnabledLooper.register(swerveSystemLoops.defaultDriveLoop());
+        mEnabledLooper.register(swerveSystemLoops.swervePeriodic());
+        mEnabledLooper.register(swerveSystemLoops.startButton());
     }
 
     @Override

@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 public final class Constants {
-
 	public static final class GlobalConstants {
 		// Robot loop time
 		public static final double LOOPER_TIME = 0.02;
@@ -14,21 +13,22 @@ public final class Constants {
 
     public static final class AutoConstants {
         // Holonomic controller PID constants - x
-        public static final double AUTO_X_KP = 1.0;
-        public static final double AUTO_X_KI = 0.0;
-        public static final double AUTO_X_KD = 0.0;
+        public static final double AUTO_X_VELOCITY_KP = 1.0;
+        public static final double AUTO_X_VELOCITY_KI = 0.0;
+        public static final double AUTO_X_VELOCITY_KD = 0.0;
 
         // Holonomic controller PID constants - y
-        public static final double AUTO_Y_KP = 1.0;
-        public static final double AUTO_Y_KI = 0.0;
-        public static final double AUTO_Y_KD = 0.0;
+        public static final double AUTO_Y_VELOCITY_KP = 1.0;
+        public static final double AUTO_Y_VELOCITY_KI = 0.0;
+        public static final double AUTO_Y_VELOCITY_KD = 0.0;
 
-        // Holonomic controller PID constants - theta
-        public static final double AUTO_THETA_KP = 1.0;
-        public static final double AUTO_THETA_KI = 0.0;
-        public static final double AUTO_THETA_KD = 0.0;
-        // Max angular velocity, acceleration in rad/s
-        public static final TrapezoidProfile.Constraints AUTO_THETA_CONSTRAINTS = new TrapezoidProfile.Constraints(6.28,3.14);
+        // Holonomic controller PID constants - theta velocity (omega)
+        public static final double AUTO_OMEGA_KP = 1.0;
+        public static final double AUTO_OMEGA_KI = 0.0;
+        public static final double AUTO_OMEGA_KD = 0.0;
+
+        // Max rotational velocity, acceleration in rad/s
+        public static final TrapezoidProfile.Constraints AUTO_OMEGA_CONSTRAINTS = new TrapezoidProfile.Constraints(6.28, 3.14);
     }
 
 	public static final class ModuleConstants {
@@ -57,7 +57,8 @@ public final class Constants {
                 new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
                 new Translation2d(WHEEL_BASE / 2, -TRACK_WIDTH / 2),
                 new Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2),
-                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
+                new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2)
+        );
 
         public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 8;
         public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 2;
@@ -95,19 +96,21 @@ public final class Constants {
         public static final double BACK_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 6.1605;
         public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 2.9207;
 
-        public static final double DRIVE_MAX_SPEED_METERS_PER_SECOND = Units.feetToMeters(13.0);
-        public static final double STEER_MAX_SPEED_RADIANS_PER_SECOND = 3.5 * 2.0 * Math.PI;
+        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(13.0);
+        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 3.5 * 2.0 * Math.PI;
 
-        public static final double TELEOP_DRIVE_MAX_ACCELERATION_UNITS_PER_SECOND = 5.0;
-        public static final double TELEOP_MAX_ANGULAR_ACCELERATION_UNITS_PER_SECOND = 3.0;
+        public static final double DRIVE_MAX_ACCELERATION = 5.0;
+        public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 3.0;
     }
 
 	public static final class OIConstants {
 		public static final int DRIVER_CONTROLLER_PORT = 0;
 
-		// Controller axis IDs
-        public static final int DRIVER_Y_AXIS = 1;
+		// Controller axis IDs        
         public static final int DRIVER_X_AXIS = 0;
+
+        public static final int DRIVER_Y_AXIS = 1;
+
         public static final int DRIVER_ROT_AXIS = 4;
         
 		// Deadband for drive axes

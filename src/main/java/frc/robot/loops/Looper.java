@@ -6,7 +6,7 @@ import java.util.*;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class Looper implements ILooper {
+public final class Looper implements ILooper {
     private boolean running;
 
     private final List<Loop> loops;

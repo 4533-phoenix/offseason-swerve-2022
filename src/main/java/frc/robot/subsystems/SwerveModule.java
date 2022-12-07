@@ -11,7 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.geometry.Rotation2d;
 
-public class SwerveModule {
+public final class SwerveModule {
     // TODO: Make a Profiled PID Controller and a Feedforward Controller for the drive motor 
     private final CANSparkMax driveMotor;
 
@@ -98,7 +98,7 @@ public class SwerveModule {
 
         state = SwerveModuleState.optimize(state, this.getState().angle);
 
-        this.driveMotor.set(state.speedMetersPerSecond / DriveConstants.DRIVE_MAX_SPEED_METERS_PER_SECOND);
+        this.driveMotor.set(state.speedMetersPerSecond / DriveConstants.DRIVE_MAX_VELOCITY);
         this.steerMotor.set(this.steerPIDController.calculate(this.getSteerPosition(), state.angle.getRadians()));
     }
 

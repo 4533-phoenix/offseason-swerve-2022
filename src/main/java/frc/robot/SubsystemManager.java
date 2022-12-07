@@ -7,7 +7,7 @@ import frc.robot.subsystems.Subsystem;
 
 import java.util.*;
 
-public class SubsystemManager implements ILooper {
+public final class SubsystemManager implements ILooper {
     public static SubsystemManager mInstance = null;
 
     private List<Subsystem> mAllSubsystems;
