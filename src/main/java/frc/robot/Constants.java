@@ -96,11 +96,11 @@ public final class Constants {
         public static final double BACK_LEFT_STEER_ABSOLUTE_ENCODER_OFFSET = 6.1605;
         public static final double BACK_RIGHT_STEER_ABSOLUTE_ENCODER_OFFSET = 2.9207;
 
-        public static final double DRIVE_MAX_VELOCITY = Units.feetToMeters(13.0);
-        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 3.5 * 2.0 * Math.PI;
+        public static final double DRIVE_MAX_VELOCITY = 1.5; // 3.9624; // m/s
+        public static final double DRIVE_MAX_ROTATIONAL_VELOCITY = 3.5 * 2.0 * Math.PI; // rad/s
 
-        public static final double DRIVE_MAX_ACCELERATION = 5.0;
-        public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 10.0;
+        public static final double DRIVE_MAX_ACCELERATION = 3.0; // 5.0; // m/s^2
+        public static final double DRIVE_MAX_ROTATIONAL_ACCELERATION = 3.0; // rad/s^2
     }
 
 	public static final class OIConstants {

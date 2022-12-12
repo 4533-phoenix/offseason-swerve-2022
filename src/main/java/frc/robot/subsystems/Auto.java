@@ -72,17 +72,48 @@ public final class Auto extends Subsystem {
     }
 
     private static final class AutoLoops {
-        public Loop runDefaultAuto() {
+        public Loop testAutonomous() {
             return new Loop() {
-                private SwervePath testAuto = SwervePath.fromCSV("Test Path");
-                private SwervePath selectedAuto = testAuto;
+                private Trajectory testAutonomousTrajectory;
                 
                 private boolean hasStarted = false;
                 private double startTime;
 
                 @Override
                 public void onStart(double timestamp) {
-                    startTime = timestamp;
+                    TrajectoryConfig config = new TrajectoryConfig(
+                        DriveConstants.DRIVE_MAX_VELOCITY, 
+                        DriveConstants.DRIVE_MAX_ACCELERATION
+                    )
+                    .addConstraint(
+                        new MaxVelocityConstraint(
+                            DriveConstants.DRIVE_MAX_VELOCITY
+                        )
+                    )
+                    .addConstraint(
+                        new SwerveDriveKinematicsConstraint(
+                            DriveConstants.SWERVE_KINEMATICS, 
+                            DriveConstants.DRIVE_MAX_VELOCITY
+                        )
+                    );
+
+                    Pose2d startPose = Swerve.getInstance().getSwervePose();
+
+                    ArrayList<Translation2d> trajectoryPoints = new ArrayList<Translation2d>(
+                        Arrays.asList(
+                            new Translation2d(startPose.getX() + 0.25, startPose.getY() + 0.25),
+                            new Translation2d(startPose.getX() + 0.50, startPose.getY() - 0.25)
+                        )
+                    );
+
+                    Pose2d endPose = new Pose2d(startPose.getX() + 0.75 , startPose.getY(), startPose.getRotation());
+
+                    this.testAutonomousTrajectory = TrajectoryGenerator.generateTrajectory(
+                        startPose, 
+                        trajectoryPoints, 
+                        endPose, 
+                        config
+                    );
                 }
 
                 @Override
@@ -90,19 +121,79 @@ public final class Auto extends Subsystem {
                     if (Auto.getInstance().isEnabled()) {
                         double currTime = Timer.getFPGATimestamp();
 
+                        if (!this.hasStarted) {
+                            this.startTime = currTime;
+
+                            this.hasStarted = true;
+                        }
+
+                        if (currTime - this.startTime > this.testAutonomousTrajectory.getTotalTimeSeconds()) {
+                            SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(
+                                new ChassisSpeeds(0.0, 0.0, 0.0)
+                            );
+
+                            Swerve.getInstance().setModuleStates(swerveModuleStates);
+
+                            return;
+                        }
+
+                        HolonomicDriveController autoController = Auto.getInstance().getAutoController();
+                        
+                        Trajectory.State trajectoryState = this.testAutonomousTrajectory.sample(currTime - this.startTime);
+
+                        ChassisSpeeds chassisSpeeds = autoController.calculate(
+                            Swerve.getInstance().getSwervePose(),
+                            trajectoryState,
+                            trajectoryState.poseMeters.getRotation()
+                        );
+
+                        SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+
+                        Swerve.getInstance().setModuleStates(swerveModuleStates);
+                    }
+                }
+
+                @Override
+                public void onStop(double timestamp) {}
+            };
+        }
+
+        public Loop testPathplannerAutonomous() {
+            return new Loop() {
+                private SwervePath testAuto;
+                
+                private boolean hasStarted = false;
+                private double startTime;
+
+                @Override
+                public void onStart(double timestamp) {
+                    this.testAuto = SwervePath.fromCSV("Test Path");
+                }
+
+                @Override
+                public void onLoop(double timestamp) {
+                    if (Auto.getInstance().isEnabled()) {
+                        double currTime = Timer.getFPGATimestamp();
+
+                        if (!hasStarted) {
+                            this.startTime = currTime;
+
+                            this.hasStarted = true;
+                        }
+
                         double time = currTime - startTime;
 
-                        PathState currState = selectedAuto.sample(time);
+                        PathState currState = testAuto.sample(time);
 
                         ChassisSpeeds chassisSpeeds = Auto.getInstance().getAutoController().calculate(
-                            Swerve.getInstance().getPoseEstimator().getEstimatedPosition(),
+                            Swerve.getInstance().getSwervePose(),
                             currState.getTrajectoryState(),
                             currState.rotation
                         );
 
-                        SwerveModuleState[] desiredStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+                        SwerveModuleState[] swerveModuleStates = DriveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
-                        Swerve.getInstance().setModuleStates(desiredStates);
+                        Swerve.getInstance().setModuleStates(swerveModuleStates);
                     }
                 }
 
@@ -116,7 +207,8 @@ public final class Auto extends Subsystem {
     public void registerEnabledLoops(ILooper looper) {
         AutoLoops autoLoops = new AutoLoops();
 
-        looper.register(autoLoops.runDefaultAuto());
+        looper.register(autoLoops.testAutonomous());
+        // looper.register(autoLoops.testPathplannerAutonomous());
     }
 
     @Override
